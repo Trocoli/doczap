@@ -3,6 +3,7 @@
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import { useState } from "react";
 import { Button } from "./button";
+import { DialogContent } from "@/components/ui/dialog";
 
 const UploadButton = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -19,6 +20,9 @@ const UploadButton = () => {
         <DialogTrigger onClick={() => {setIsOpen(true)}} asChild>
             <Button>Upload PDF</Button>
         </DialogTrigger>
+        <DialogContent>
+            example content
+        </DialogContent>
     </Dialog>
   );
 };
