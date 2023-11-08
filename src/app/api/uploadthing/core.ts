@@ -1,3 +1,4 @@
+import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { uzCyrl } from "date-fns/locale";
@@ -21,9 +22,15 @@ export const ourFileRouter = {
       return {userId: user.id};
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Upload complete for userId:", metadata.userId);
-
-      console.log("file url", file.url);
+      const createdFile = await db.file.create({
+        data: {
+          key: file.key,
+          name: file.name,
+          userId: metadata.userId,
+          url: `https://uploadthing-prod.s3.us-west-2.amazonaws.com/${file.key}`, // file.url sometimes timeout
+          uploadStatus: 'PROCESSING'
+        }
+      })
     }),
 } satisfies FileRouter;
 
