@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "./button";
 import { DialogContent } from "@/components/ui/dialog";
 import Dropzone from "react-dropzone";
-import { Cloud, File } from "lucide-react";
+import { Cloud, File, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useUploadThing } from "@/lib/uploadthing";
 import { useToast } from "@/components/ui/use-toast";
@@ -119,10 +119,25 @@ const UploadDropzone = () => {
                   <Progress
                     value={uploadingProgress}
                     className="h-1 w-full bg-zinc-200"
+                    indicatorColor={
+                      uploadingProgress === 100 ? "bg-green-500" : ""
+                    }
                   />
+
+                  {uploadingProgress === 100 ? (
+                    <div className="flex gap-1  items-center justify-center text-sm text-zinc-700 text-center pt-2">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Redirecionando...
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
-              <input {...getInputProps()} type="file" id='dropzone-file' className="hidden"  />
+              <input
+                {...getInputProps()}
+                type="file"
+                id="dropzone-file"
+                className="hidden"
+              />
             </label>
           </div>
         </div>
