@@ -3,6 +3,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { ChevronDown, ChevronUp, Loader2, SearchIcon } from "lucide-react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { useResizeDetector } from "react-resize-detector";
+import SimpleBar from "simplebar-react";
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -133,33 +134,35 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
       </div>
 
       <div className="flex-1 w-full max-h-screen">
-        <div ref={ref}>
-          <Document
-            loading={
-              <div className="flex justify-center">
-                <Loader2 className="my-24 h-6 w-6 animate-spin" />
-              </div>
-            }
-            onLoadError={() => {
-              toast({
-                title: "Erro ao carregar PDF",
-                description: "Por favor tente novamente mais tarde",
-                variant: "destructive",
-              });
-            }}
-            onLoadSuccess={({ numPages }) => {
-              setNumOfPages(numPages);
-            }}
-            file={url}
-            className="max-h-full "
-          >
-            <Page
-              width={width ? width : 1}
-              pageNumber={currentPage}
-              scale={scale}
-            />
-          </Document>
-        </div>
+        <SimpleBar autoHide={false} className="max-h-[calc(100vh - 10rem)]">
+          <div ref={ref}>
+            <Document
+              loading={
+                <div className="flex justify-center">
+                  <Loader2 className="my-24 h-6 w-6 animate-spin" />
+                </div>
+              }
+              onLoadError={() => {
+                toast({
+                  title: "Erro ao carregar PDF",
+                  description: "Por favor tente novamente mais tarde",
+                  variant: "destructive",
+                });
+              }}
+              onLoadSuccess={({ numPages }) => {
+                setNumOfPages(numPages);
+              }}
+              file={url}
+              className="max-h-full "
+            >
+              <Page
+                width={width ? width : 1}
+                pageNumber={currentPage}
+                scale={scale}
+              />
+            </Document>
+          </div>
+        </SimpleBar>
       </div>
     </div>
   );
