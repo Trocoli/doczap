@@ -26,6 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import PDFFullscreen from "./PDFFullscreen";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -62,6 +63,7 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
   });
 
   const { width, ref } = useResizeDetector();
+
   const handlePageSubmit = ({ page }: TCustomPageValidator) => {
     setCurrentPage(Number(page));
     setValue("page", String(page));
@@ -75,6 +77,7 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
             disabled={currentPage <= 1}
             onClick={() => {
               setCurrentPage((prev) => (prev - 1 > 1 ? prev - 1 : 1));
+              setValue("page", String(currentPage - 1))
             }}
             aria-label="previous page"
             variant="ghost"
@@ -106,6 +109,7 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
               setCurrentPage((prev) =>
                 prev + 1 > numOfPages! ? numOfPages! : prev + 1
               );
+              setValue("page", String(currentPage + 1))
             }}
             aria-label="next page"
             variant="ghost"
@@ -145,6 +149,8 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
           >
             <RotateCw className="h-4 w-4" />
           </Button>
+
+          <PDFFullscreen fileUrl={url} />
         </div>
       </div>
 
