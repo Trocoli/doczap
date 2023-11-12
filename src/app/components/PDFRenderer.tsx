@@ -1,6 +1,6 @@
 "use client";
 import { useToast } from "@/components/ui/use-toast";
-import { ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2, SearchIcon } from "lucide-react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { useResizeDetector } from "react-resize-detector";
 
@@ -13,6 +13,12 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "../lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -25,9 +31,12 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
 
   const [numOfPages, setNumOfPages] = useState<number>();
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [scale, setScale] = useState<number>(1);
 
   const CustomPageValidator = z.object({
-    page: z.string().refine((num) => +num > 0 && +num <= numOfPages!),
+    page: z
+      .string()
+      .refine((num) => Number(num) > 0 && Number(num) <= numOfPages!),
   });
 
   type TCustomPageValidator = z.infer<typeof CustomPageValidator>;
@@ -45,9 +54,8 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
   });
 
   const { width, ref } = useResizeDetector();
-
   const handlePageSubmit = ({ page }: TCustomPageValidator) => {
-    setCurrentPage(+page);
+    setCurrentPage(Number(page));
     setValue("page", String(page));
   };
 
@@ -69,7 +77,10 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
           <div className="flex items-center gap-1.5">
             <Input
               {...register("page")}
-              className={cn("w-12 h-8", errors.page && "outline-red-500")}
+              className={cn(
+                "w-12 h-8",
+                errors.page && "focus-visible:ring-red-500"
+              )}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   handleSubmit(handlePageSubmit)();
@@ -94,6 +105,31 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
             <ChevronUp className="h-4 w-4" />
           </Button>
         </div>
+
+        <div className="space-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="gap-1.5" aria-label="zoom" variant="ghost">
+                <SearchIcon className="h-4 w-4" />
+                {scale * 100}%<ChevronDown className="h-3 w-3 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={() => setScale(1)}>
+                100%
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setScale(1.5)}>
+                150%
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setScale(2)}>
+                200%
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setScale(2.5)}>
+                250%
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <div className="flex-1 w-full max-h-screen">
@@ -117,7 +153,11 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
             file={url}
             className="max-h-full "
           >
-            <Page width={width ? width : 1} pageNumber={currentPage} />
+            <Page
+              width={width ? width : 1}
+              pageNumber={currentPage}
+              scale={scale}
+            />
           </Document>
         </div>
       </div>
