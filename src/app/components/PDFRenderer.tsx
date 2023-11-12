@@ -1,6 +1,12 @@
 "use client";
 import { useToast } from "@/components/ui/use-toast";
-import { ChevronDown, ChevronUp, Loader2, SearchIcon } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  RotateCw,
+  SearchIcon,
+} from "lucide-react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { useResizeDetector } from "react-resize-detector";
 import SimpleBar from "simplebar-react";
@@ -33,6 +39,7 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
   const [numOfPages, setNumOfPages] = useState<number>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [scale, setScale] = useState<number>(1);
+  const [rotation, setRotation] = useState<number>(0);
 
   const CustomPageValidator = z.object({
     page: z
@@ -130,6 +137,14 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <Button
+            aria-label="rotate 90 degrees"
+            variant="ghost"
+            onClick={() => setRotation((prev) => prev + 90)}
+          >
+            <RotateCw className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
@@ -159,6 +174,7 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
                 width={width ? width : 1}
                 pageNumber={currentPage}
                 scale={scale}
+                rotate={rotation}
               />
             </Document>
           </div>
