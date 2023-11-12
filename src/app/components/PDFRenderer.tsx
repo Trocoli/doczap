@@ -9,6 +9,10 @@ import "react-pdf/dist/Page/TextLayer.css";
 import { Button } from "./ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { cn } from "../lib/utils";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -22,7 +26,30 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
   const [numOfPages, setNumOfPages] = useState<number>();
   const [currentPage, setCurrentPage] = useState<number>(1);
 
+  const CustomPageValidator = z.object({
+    page: z.string().refine((num) => +num > 0 && +num <= numOfPages!),
+  });
+
+  type TCustomPageValidator = z.infer<typeof CustomPageValidator>;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<TCustomPageValidator>({
+    defaultValues: {
+      page: "1",
+    },
+    resolver: zodResolver(CustomPageValidator),
+  });
+
   const { width, ref } = useResizeDetector();
+
+  const handlePageSubmit = ({ page }: TCustomPageValidator) => {
+    setCurrentPage(+page);
+    setValue("page", String(page));
+  };
 
   return (
     <div className="w-full bg-white rounded-md shadow flex flex-col items-center ">
@@ -41,8 +68,13 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
 
           <div className="flex items-center gap-1.5">
             <Input
-              className="w-12 h-8"
-              defaultValue={currentPage}
+              {...register("page")}
+              className={cn("w-12 h-8", errors.page && "outline-red-500")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSubmit(handlePageSubmit)();
+                }
+              }}
             />
             <p className="text-zinc-700 text-sm space-x-1">
               <span>/</span>
