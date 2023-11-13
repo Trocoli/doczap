@@ -1,4 +1,6 @@
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "../ui/button";
+import { Send } from "lucide-react";
 
 interface ChatInputProps {
   isDisabled: boolean;
@@ -21,6 +23,7 @@ const ChatInput = ({ isDisabled }: ChatInputProps) => {
                 maxRows={4}
                 placeholder="Faça sua pergunta"
               ></Textarea>
+              <Button className="absolute bottom-1.5 right-[8px]" aria-label='enviar mensagem'><Send  className="h-4 w-4"/></Button>
             </div>
           </div>
         </div>
