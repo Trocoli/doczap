@@ -1,8 +1,10 @@
 import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { TRPCError } from "@trpc/server";
-import { uzCyrl } from "date-fns/locale";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
+import { PDFLoader } from "langchain/document_loaders/fs/pdf";
+import { pinecone } from "@/app/lib/pinecone";
+import {OpenAIEmbeddings} from 'langchain/embeddings/openai'
 
 const f = createUploadthing();
 
@@ -18,8 +20,7 @@ export const ourFileRouter = {
         throw new Error("Unauthorized");
       }
 
-
-      return {userId: user.id};
+      return { userId: user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
       const createdFile = await db.file.create({
@@ -28,12 +29,29 @@ export const ourFileRouter = {
           name: file.name,
           userId: metadata.userId,
           url: `https://uploadthing-prod.s3.us-west-2.amazonaws.com/${file.key}`, // file.url sometimes timeout
-          uploadStatus: 'PROCESSING'
-        }
-      })
+          uploadStatus: "PROCESSING",
+        },
+      });
 
-      
+      try {
+        const response = await fetch(
+          `https://uploadthing-prod.s3.us-west-2.amazonaws.com/${file.key}`
+        );
 
+        // load pdf into memory
+        const blob = await response.blob();
+        const loader = new PDFLoader(blob);
+
+        const pageLevelDocs = await loader.load();
+        const numberOfPages = pageLevelDocs.length;
+
+        // vectorize and index entire document
+        const pineconeIndex = pinecone.Index("doczap");
+        const embeddings = new OpenAIEmbeddings()
+
+
+
+      } catch (error) {}
     }),
 } satisfies FileRouter;
 
