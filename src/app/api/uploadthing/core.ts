@@ -4,7 +4,8 @@ import { TRPCError } from "@trpc/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { pinecone } from "@/app/lib/pinecone";
-import {OpenAIEmbeddings} from 'langchain/embeddings/openai'
+import { PineconeStore } from "langchain/vectorstores/pinecone";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 
 const f = createUploadthing();
 
@@ -47,11 +48,33 @@ export const ourFileRouter = {
 
         // vectorize and index entire document
         const pineconeIndex = pinecone.Index("doczap");
-        const embeddings = new OpenAIEmbeddings()
+        const embeddings = new OpenAIEmbeddings({
+          openAIApiKey: process.env.OPENAI_API_KEY,
+        });
 
+        await PineconeStore.fromDocuments(pageLevelDocs, embeddings, {
+          pineconeIndex,
+          namespace: createdFile.id,
+        });
 
-
-      } catch (error) {}
+        await db.file.update({
+          data: {
+            uploadStatus: "SUCCESS",
+          },
+          where: {
+            id: createdFile.id,
+          },
+        });
+      } catch (error) {
+        await db.file.update({
+          data: {
+            uploadStatus: "FAILED",
+          },
+          where: {
+            id: createdFile.id,
+          },
+        });
+      }
     }),
 } satisfies FileRouter;
 
