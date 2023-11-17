@@ -1,15 +1,17 @@
 import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { TRPCError } from "@trpc/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
-import { pinecone } from "@/app/lib/pinecone";
-import { PineconeStore } from "langchain/vectorstores/pinecone";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import {
+  PineconeLibArgs,
+  PineconeStore,
+} from "langchain/vectorstores/pinecone";
+import { getPineconeClient } from "@/lib/pinecone";
 
 const f = createUploadthing();
 
-const auth = (req: Request) => ({ id: "fakeId" }); // Fake auth function
+// const auth = (req: Request) => ({ id: "fakeId" }); // Fake auth function
 
 export const ourFileRouter = {
   PDFUploader: f({ pdf: { maxFileSize: "4MB" } })
@@ -47,6 +49,7 @@ export const ourFileRouter = {
         const numberOfPages = pageLevelDocs.length;
 
         // vectorize and index entire document
+        const pinecone = await getPineconeClient();
         const pineconeIndex = pinecone.Index("doczap");
         const embeddings = new OpenAIEmbeddings({
           openAIApiKey: process.env.OPENAI_API_KEY,
