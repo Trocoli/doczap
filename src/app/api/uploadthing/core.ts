@@ -4,12 +4,12 @@ import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import {
-  PineconeLibArgs,
   PineconeStore,
 } from "langchain/vectorstores/pinecone";
 import { getPineconeClient } from "@/lib/pinecone";
 
 const f = createUploadthing();
+
 
 // const auth = (req: Request) => ({ id: "fakeId" }); // Fake auth function
 
@@ -57,7 +57,7 @@ export const ourFileRouter = {
 
         await PineconeStore.fromDocuments(pageLevelDocs, embeddings, {
           pineconeIndex,
-          namespace: createdFile.id,
+         // namespace: createdFile.id,
         });
 
         await db.file.update({
@@ -69,6 +69,7 @@ export const ourFileRouter = {
           },
         });
       } catch (error) {
+        console.log(error)
         await db.file.update({
           data: {
             uploadStatus: "FAILED",

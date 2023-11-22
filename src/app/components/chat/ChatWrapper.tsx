@@ -85,7 +85,7 @@ const ChatWrapper = ({ fileId }: ChatWrapperProps) => {
         <div className="flex-1 justify-between flex flex-col mb-28">
           <Messages />
         </div>
-        <ChatInput isDisabled />
+        <ChatInput  />
       </div>
     </ChatCtxProvider>
   );

@@ -5,7 +5,7 @@ import { useContext, useRef } from "react";
 import { ChatCtx } from "./ChatContext";
 
 interface ChatInputProps {
-  isDisabled: boolean;
+  isDisabled?: boolean;
 }
 
 const ChatInput = ({ isDisabled }: ChatInputProps) => {
@@ -42,6 +42,12 @@ const ChatInput = ({ isDisabled }: ChatInputProps) => {
                 placeholder="Faça sua pergunta"
               ></Textarea>
               <Button
+                disabled={isLoading || isDisabled}
+                type="submit"
+                onClick={() => {
+                  addMessage();
+                  textareaRef.current?.focus();
+                }}
                 className="absolute bottom-1.5 right-[8px]"
                 aria-label="enviar mensagem"
               >

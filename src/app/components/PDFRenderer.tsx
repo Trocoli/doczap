@@ -19,7 +19,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { cn } from "../lib/utils";
+import { cn } from "../../lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -77,7 +77,7 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
             disabled={currentPage <= 1}
             onClick={() => {
               setCurrentPage((prev) => (prev - 1 > 1 ? prev - 1 : 1));
-              setValue("page", String(currentPage - 1))
+              setValue("page", String(currentPage - 1));
             }}
             aria-label="previous page"
             variant="ghost"
@@ -109,7 +109,7 @@ const PDFRenderer = ({ url }: PdfRendererProps) => {
               setCurrentPage((prev) =>
                 prev + 1 > numOfPages! ? numOfPages! : prev + 1
               );
-              setValue("page", String(currentPage + 1))
+              setValue("page", String(currentPage + 1));
             }}
             aria-label="next page"
             variant="ghost"
